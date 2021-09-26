@@ -1,5 +1,5 @@
 ## Preface
-####Hello, before you browse this repository, there are some things have to know:
+#### Hello, before you browse this repository, there are some things have to know:
 1. All implementations in this repository are only for practicing(non-commercial).
 2. I can't guarantee that all code I wrote in this repository are correct.  
    But I tried to simply express the concept in the annotations when a new function(or concept is used).  
