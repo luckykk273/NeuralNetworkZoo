@@ -1,0 +1,68 @@
+Detailed explain the four things about the variables and scopes in Tensorflow as follow:
+    - tf.Variable(): Simply initialize a variable;
+                     represents a tensor whose value can be changed by running ops on it.
+
+    - tf.get_variable(): Gets an existing variable with these parameters or create a new one.
+
+    - Same: tf.get_variable() and tf.Variable() both create(or obtain) a new variable under a name scope.
+
+    - Difference:
+        - tf.Variable() will automatically check whether the name of variable is reused(name conflict).
+          If the name of variable is reused, tf.Variable() will handle it automatically;
+          Instead, tf.get_variable() won't handle it.
+          If the name of variable is reused and is not set as a sharing variable,
+          Tensorflow will raise an error.
+
+        - tf.Variable() can create two variables with the same names under one name scope.
+          If one variable is created with a specific name, tf.get_variable() will obtain this variable;
+          If this specific name doesn't exist, tf.get_variable() will create it.
+    --------------------------------------------------------------------------------------------------------------------
+    - tf.name_scope(): (`Definition from Tensorflow official website`)
+        - A context manager for use when defining a Python op.
+        - This context manager pushes a name scope,
+          which will make the name of all operations added within it have a prefix.
+        - If the scope name already exists, the name will be made unique by appending _n.
+        - op is the operation which represent a graph node that performs computation on tensors.
+
+    - tf.variable_scope(): (`Definition from Tensorflow official website`)
+        - A context manager for defining ops that creates variables (layers).
+        - This context manager validates that the (optional) values are from the same graph,
+          ensures that graph is the default graph, and pushes a name scope and a variable scope.
+        - Variable scope allows you to create new variables and to share already created ones
+          while providing checks to not create or share by accident.
+
+In fact, we can use dict() to encapsulate the name and variables, then we can just initialize these variables one time.
+Below is a simple example:
+def conv2d_relu(x):
+    conv_W1 = tf.Variable(tf.random_normal([5, 5, 32, 32]), name='conv_W1')
+    conv_b1 = tf.Variable(tf.zeros([32]), name='conv_b1')
+    conv_1 = tf.nn.conv2d(x, conv_W1, strides=[1, 1, 1, 1], padding='SAME', name='conv_1')
+    relu_1 = tf.nn.relu(tf.add(layer_1, conv_b1))
+
+    return relu_1
+
+We use tf.Variable() to initialize 2 parameters in conv2d_relu().
+Once we call conv2d_relu(x), we have to initialize the variables in the function again.
+We can easily put the initialization of parameters out of the conv2d_relu() as below:
+conv_dict = {
+    'conv_W1': tf.Variable(tf.random_normal([5, 5, 32, 32]), name='conv_W1'),
+    'conv_b1': conv_b1 = tf.Variable(tf.zeros([32]), name='conv_b1')
+}
+
+def conv2d_relu(x):
+    conv_1 = tf.nn.conv2d(x, conv_dict['conv_W1'], strides=[1, 1, 1, 1], padding='SAME', name='conv_1')
+    relu_1 = tf.nn.relu(tf.add(layer_1, conv_dict['conv_b1']))
+
+    return relu_1
+
+Now we only have to initialize weights and biases one time in the beginning.
+In Tensorflow, it provide some convenient ways to fulfill the same work.
+(that is, tf.name_scope() and tf.variable_scope())
+tf.variable_scope() makes us easily instantiate parameters in the function,
+rather than declare a long long dict() to save parameters manually.
+
+There are many implementations and explanations on Tensorflow official website:
+    - tf.Variable(): https://www.tensorflow.org/versions/r1.15/api_docs/python/tf/Variable
+    - tf.get_variable(): https://www.tensorflow.org/versions/r1.15/api_docs/python/tf/get_variable
+    - tf.variable_scope(): https://www.tensorflow.org/api_docs/python/tf/variable_scope
+    - tf.name_scope(): https://www.tensorflow.org/api_docs/python/tf/name_scope

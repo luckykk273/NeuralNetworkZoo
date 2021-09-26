@@ -1,0 +1,19 @@
+All Neural Networks can be called to demo.
+Note that RNN, LSTM, GRU has initial state problem!
+If set initial state to None, there is no problem;
+Else there is error as below:
+'tensorflow.python.framework.errors_impl.InvalidArgumentError: ConcatOp : Dimensions of inputs should match'
+
+Answer:
+When our data is not divisible by batch size, the last batch size will not fit the initial state shape!
+ex:
+    data size = 100
+    batch size = initial state = 16
+    100/16 = 6...4
+    (last batch size = 4) != (initial state = 16)
+
+So if someone wants to use RNN, LSTM, GRU with initial state:
+    - Don't use the last batch which is not divisible by batch size.
+      (Just throw the last batch away.)
+    - Make data size can be divisible by batch size.
+      (Change data size from 100 to 96.)
